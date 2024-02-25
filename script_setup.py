@@ -6,7 +6,10 @@ def generate_commit_dates(start_date, end_date):
     delta = end_date - start_date
     for i in range(delta.days + 1):
         day = start_date + timedelta(days=i)
-        num_commits = random.randint(1, 15)
+        if day.weekday() < 5:  # Du lundi au vendredi
+            num_commits = random.randint(0, 0)
+        else:  # Samedi et dimanche
+            num_commits = random.randint(0, 5)
         for _ in range(num_commits):
             hour = random.randint(8, 22)
             minute = random.randint(0, 59)
@@ -15,21 +18,23 @@ def generate_commit_dates(start_date, end_date):
 
 def commit_on_date(commit_date):
     formatted_date = commit_date.strftime("%Y-%m-%dT%H:%M:%S +0100")
-    # Mettre à jour le fichier timestamp.txt avec un timestamp aléatoire
     with open('timestamp.txt', 'w') as file:
-        file.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-    # Stage le fichier
+        file.write(commit_date.strftime("%Y-%m-%d %H:%M:%S"))
     subprocess.run(['git', 'add', 'timestamp.txt'], check=True)
-    # Créer un commit avec la date spécifiée
     subprocess.run(['git', 'commit', '--date', formatted_date, '-m', f'Commit du {formatted_date}'], check=True)
-    # Ajouter un print pour afficher le jour et l'heure du commit
     print(f"Commit effectué pour le {commit_date.strftime('%d/%m/%Y à %H:%M:%S')}")
 
-if __name__ == "__main__":
-    start_date = datetime(2023, 2, 26)
-    end_date = datetime(2024, 2, 25)
-    for commit_date in generate_commit_dates(start_date, end_date):
-        commit_on_date(commit_date)
-    # Pousser tous les changements, y compris les branches, vers le dépôt distant à la fin du script
+def push_changes():
     subprocess.run(['git', 'push', '--all'], check=True)
-    print("Tous les changements et toutes les branches ont été poussés.")
+    print("Changements poussés vers le dépôt distant.")
+
+if __name__ == "__main__":
+    start_date = datetime(2023, 4, 24)
+    end_date = datetime(2023, 9, 26)
+    last_push_date = start_date
+    for commit_date in generate_commit_dates(last_push_date, end_date):
+        commit_on_date(commit_date)
+        if (commit_date - last_push_date).days >= 30:
+            push_changes()
+            last_push_date = commit_date
+    push_changes()  # Assure un dernier push à la fin du script
