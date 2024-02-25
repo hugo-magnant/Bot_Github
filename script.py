@@ -4,7 +4,12 @@ import os
 import time
 
 def schedule_commits():
-    num_commits = random.randint(1, 15)
+    today = datetime.datetime.now().date()
+    # Détermine si aujourd'hui est un jour de semaine ou le week-end
+    if today.weekday() < 5:  # Lundi à vendredi
+        num_commits = random.randint(7, 15)
+    else:  # Samedi et dimanche
+        num_commits = random.randint(3, 10)
     commit_hours = sorted(random.sample(range(8 * 60, 22 * 60), num_commits))
     return [datetime.time(hour // 60, hour % 60) for hour in commit_hours]
 
