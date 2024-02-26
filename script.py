@@ -51,4 +51,5 @@ def main():
     log_message("Script ended.")
 
 
+print("Started")
 main()
