@@ -50,5 +50,5 @@ def main():
     log_message("All commits for today have been performed.")
     log_message("Script ended.")
 
-if __name__ == "__main__":
-    main()
+
+main()
